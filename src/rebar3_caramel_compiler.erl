@@ -1,7 +1,7 @@
 -module(rebar3_caramel_compiler).
 -behaviour(rebar_compiler).
 
--define(COMPILER_VSN, "v0.0.14").
+-define(COMPILER_VSN, "v0.1.0").
 
 -export([context/1,
          needed_files/4,
@@ -81,7 +81,7 @@ compile(Source, [{".erl", SrcDir}], AppInfo, Opts) ->
     %% rebar_api:console("TopDir: ~p", [TopDir]),
     case find_compiler(TopDir) of
         false ->
-            rebar_api:error("caramelc compiler not found. Make sure you have it installed (https://github.com/AbstractMachinesLab/caramel) and it is in your PATH", []),
+            rebar_api:error("caramel compiler not found. Make sure you have it installed (https://github.com/AbstractMachinesLab/caramel) and it is in your PATH", []),
             rebar_compiler:error_tuple(Source, [], [], Opts);
         Exec ->
             SourceFile = filename:basename(Source),
@@ -100,7 +100,7 @@ compile(Source, [{".erl", SrcDir}], AppInfo, Opts) ->
 find_compiler(TopDir) ->
     %% Otherwise if there is a compiler in $PATH use that one
     %% Otherwise install the current version of the compiler
-    case os:find_executable("caramelc") of
+    case os:find_executable("caramel") of
         false ->
             %% Look for a compiler in the plugins dir
             %%AllDeps = rebar_state:all_plugin_deps(State),
@@ -108,13 +108,13 @@ find_compiler(TopDir) ->
             %%    {ok, AppInfo} ->
             %%        rebar_api:console("CaramalApp: ~p", [rebar_app_info:fetch_dir(AppInfo)]),
             %%        PluginsDir = rebar_app_info:fetch_dir(AppInfo),
-            %%        Compiler = filename:join([PluginsDir, "bin", "caramelc"]),
+            %%        Compiler = filename:join([PluginsDir, "bin", "caramel"]),
             %%        ensure_compiler_version(Compiler);
             %%    _ ->
             %%        false
             %%end;
             PluginsDir = filename:join([TopDir, "_build", "default", "plugins", "rebar3_caramel"]),
-            Compiler = filename:join([PluginsDir, "caramel", "bin", "caramelc"]),
+            Compiler = filename:join([PluginsDir, "caramel", "bin", "caramel"]),
             ok = ensure_compiler_version(Compiler, PluginsDir),
             Compiler;
         Exec ->
@@ -132,15 +132,15 @@ ensure_compiler_version(Compiler, PluginsDir) ->
                               ok;
                             true ->
                                 %% Not the right version, fetch the matching version
-                                rebar_api:info("Upgrading caramelc from ~s to ~s", [Version, ?COMPILER_VSN]),
+                                rebar_api:info("Upgrading caramel from ~s to ~s", [Version, ?COMPILER_VSN]),
                                 ok = install_compiler(PluginsDir)
                         end;
                     _ ->
-                        rebar_api:info("Installing caramelc ~s", [?COMPILER_VSN]),
+                        rebar_api:info("Installing caramel ~s", [?COMPILER_VSN]),
                         ok = install_compiler(PluginsDir)
                 end;
             false ->
-                rebar_api:info("Installing caramelc ~s", [?COMPILER_VSN]),
+                rebar_api:info("Installing caramel ~s", [?COMPILER_VSN]),
                 ok = install_compiler(PluginsDir)
         end.
 
@@ -161,7 +161,7 @@ install_compiler(PluginsDir) ->
 
         {ok, {{_, StatusCode, _}, _RespHeaders, _RespBody}} ->
              rebar_api:console("Install: ~p", [StatusCode]),
-             rebar_api:error("caramelc compiler failed to download ~p", [StatusCode]),
+             rebar_api:error("caramel compiler failed to download ~p", [StatusCode]),
             {error, StatusCode};
         {error, Reason} ->
              {error, Reason}
